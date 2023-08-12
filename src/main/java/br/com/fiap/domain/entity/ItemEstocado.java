@@ -1,17 +1,43 @@
 package br.com.fiap.domain.entity;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "TB_ITEM", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_ITEM_NR_SERIE", columnNames = {"NR_SERIE"})
+})
 public class ItemEstocado {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SQ_ITEM")
+    @SequenceGenerator(name = "SQ_ITEM", sequenceName = "SQ_ITEM")
+    @Column(name = "ID_ITEM")
     private Long id;
-    private Produto produto;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(
+            name = "ID_DEPOSITO",
+            referencedColumnName = "ID_DEPOSITO",
+            foreignKey = @ForeignKey(name = "FK_ITEM_DEPOSITO")
+    )
     private Deposito deposito;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(
+            name = "ID_PRODUTO",
+            referencedColumnName = "ID_PRODUTO",
+            foreignKey = @ForeignKey(name = "FK_ITEM_PRODUTO")
+    )
+    private Produto produto;
+    @Column(name = "DT_ENTRADA", nullable = false)
     private LocalDateTime entrada;
+    @Column(name = "DT_SAIDA")
     private LocalDateTime saida;
 
+    @Column(name = "NR_SERIE", nullable = false)
     private String numeroDeSerie;
 
-    public ItemEstocado() {}
+    public ItemEstocado() {
+    }
 
     public ItemEstocado(Long id, Produto produto, Deposito deposito, LocalDateTime entrada, LocalDateTime saida, String numeroDeSerie) {
         this.id = id;
